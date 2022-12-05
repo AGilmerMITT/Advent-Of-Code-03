@@ -8,9 +8,16 @@
             bool collectingData = true;
             while (collectingData)
             {
-                string bag = GetInput("Put bag here");
-                prioritySum += ParseBag(bag);
-                if (bag == "")
+                string[] bags = { GetInput("First bag of group:"), GetInput("Second bag of group:"), GetInput("Third bag of group:") };
+
+                //prioritySum += ParseBag(bag);
+                //if (bag == "")
+                //{
+                //    collectingData = false;
+                //}
+                int priority = GetPriority(GetBadge(bags));
+                prioritySum += priority;
+                if (priority == 0)
                 {
                     collectingData = false;
                 }
@@ -49,8 +56,39 @@
             return 0;
         }
 
+        static char GetBadge(string[] bags)
+        {
+            if (bags.Length == 0)
+            {
+                throw new Exception("Must have bags for comparison");
+            }
+
+            IEnumerable<char> result = new List<char>(bags[0]);
+            for (int i = 1; i < bags.Length; i++)
+            {
+                result = result.Intersect(bags[i]);
+            }
+
+            if (result.Count() > 1)
+            {
+                throw new Exception("Multiple potential badges found");
+            }
+
+            if (result.Count() == 0)
+            {
+                return '0';
+            }
+
+            return result.ToArray()[0];
+        }
+
         static int GetPriority(char letter)
         {
+            if (letter == '0')
+            {
+                return 0;
+            }
+
             if (char.IsLower(letter))
             {
                 return letter + 1 - 'a';
